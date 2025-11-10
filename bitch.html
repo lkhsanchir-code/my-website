@@ -1,0 +1,534 @@
+<!doctype html>
+<html lang="mn">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Enemy at the Gate — Сталинградын үе (Cinematic landing)</title>
+
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:#0f0f10;
+    --muted:#cfcfcf;
+    --accent:#c9413b;
+    --glass: rgba(255,255,255,0.06);
+    --max:1200px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family: "Montserrat", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    background:var(--bg);
+    color:var(--muted);
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+  }
+
+  /* Page container */
+  .page{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+  }
+
+  /* Sticky top nav */
+  header.site-header{
+    position:fixed;
+    top:0; left:0; right:0;
+    height:72px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:60;
+    background: linear-gradient(180deg, rgba(10,10,10,0.6), rgba(10,10,10,0.05));
+    backdrop-filter: blur(4px);
+    border-bottom:1px solid rgba(255,255,255,0.03);
+  }
+  .nav-wrap{
+    width:100%;
+    max-width:var(--max);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 20px;
+    gap:12px;
+  }
+  .brand{
+    display:flex; align-items:center; gap:12px;
+  }
+  .brand .logo{
+    font-weight:800;
+    font-size:20px;
+    color:var(--accent);
+    letter-spacing:1px;
+  }
+  nav.main-nav{ display:flex; gap:18px; align-items:center; }
+  nav.main-nav a{
+    color:var(--muted);
+    text-decoration:none;
+    font-weight:600;
+    font-size:14px;
+    padding:8px 6px;
+    transition:color .18s;
+  }
+  nav.main-nav a:hover{ color:white }
+
+  /* HERO / SLIDES */
+  .hero{
+    position:relative;
+    height:88vh;
+    min-height:540px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+  }
+
+  /* slideshow background layers */
+  .slides{
+    position:absolute; inset:0;
+    display:block;
+    z-index:1;
+  }
+  .slide{
+    position:absolute; inset:0;
+    background-size:cover;
+    background-position:center;
+    opacity:0;
+    transform:scale(1.03);
+    transition:opacity .9s ease, transform 1.2s ease;
+    filter:grayscale(.05) contrast(.95) brightness(.86);
+  }
+  .slide.active{ opacity:1; transform:scale(1); filter:grayscale(0) contrast(1) brightness(.98) }
+
+  /* dark vignette & cinematic title area */
+  .hero-overlay{
+    position:relative;
+    z-index:5;
+    width:100%;
+    max-width:var(--max);
+    padding:36px;
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:20px;
+    pointer-events:none;
+  }
+
+  .left-content{
+    pointer-events:auto;
+    max-width:65%;
+    color:var(--muted);
+  }
+  .eyebrow{
+    display:inline-block;
+    background:var(--glass);
+    padding:8px 12px;
+    border-radius:999px;
+    font-weight:700;
+    color:#fff;
+    font-size:13px;
+    margin-bottom:14px;
+    backdrop-filter: blur(6px);
+  }
+  h1.hero-title{
+    margin:0;
+    font-family:"Playfair Display", serif;
+    font-size:44px;
+    color:#fff;
+    letter-spacing:1px;
+    margin-bottom:10px;
+    line-height:1.02;
+  }
+  p.lead{
+    color: #e7e7e7;
+    margin:0 0 18px 0;
+    font-size:16px;
+    max-width:54ch;
+  }
+  .cta-row{ display:flex; gap:12px; align-items:center; }
+  .btn{
+    background:var(--accent);
+    color:white;
+    padding:10px 16px;
+    border-radius:8px;
+    text-decoration:none;
+    font-weight:700;
+    box-shadow:0 8px 18px rgba(201,65,59,0.12);
+    pointer-events:auto;
+  }
+  .more-link{
+    color:rgba(255,255,255,0.85);
+    text-decoration:none;
+    font-weight:600;
+    padding:8px;
+    pointer-events:auto;
+  }
+
+  /* bottom thumbnails (numbers + small circles) */
+  .thumbs{
+    position:absolute;
+    left:50%;
+    transform:translateX(-50%);
+    bottom:26px;
+    display:flex;
+    gap:28px;
+    z-index:8;
+    pointer-events:auto;
+  }
+  .thumb{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:rgba(255,255,255,0.06);
+    padding:8px 14px;
+    border-radius:999px;
+    color:#fff;
+    font-weight:600;
+    cursor:pointer;
+    transition:background .18s, transform .18s;
+  }
+  .thumb:hover{ transform:translateY(-4px); background:rgba(255,255,255,0.09) }
+  .thumb .dot{
+    width:44px; height:44px; border-radius:50%; background:rgba(0,0,0,0.28); display:flex; align-items:center; justify-content:center; font-size:12px;
+    border: 2px solid rgba(255,255,255,0.06)
+  }
+
+  /* side social bar vertical */
+  .social-side{
+    position:fixed; right:14px; top:50%; transform:translateY(-50%); z-index:70;
+    display:flex; flex-direction:column; gap:12px; pointer-events:auto;
+  }
+  .social-side a{
+    writing-mode:vertical-rl;
+    text-orientation:mixed;
+    background:rgba(255,255,255,0.05);
+    padding:10px 8px;
+    color:#fff; text-decoration:none; font-weight:700; border-radius:6px;
+    transform-origin:center;
+    transition:transform .16s, background .16s;
+  }
+  .social-side a:hover{ transform:translateX(-6px) rotate(-2deg); background:rgba(255,255,255,0.09) }
+
+  /* arrows */
+  .arrow{
+    position:absolute;
+    top:50%;
+    transform:translateY(-50%);
+    width:64px; height:64px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(0,0,0,0.25);
+    color:#fff; cursor:pointer;
+    z-index:9; pointer-events:auto;
+    transition:transform .16s, background .16s;
+  }
+  .arrow:hover{ transform:translateY(-50%) scale(1.06); background:rgba(0,0,0,0.35) }
+  .arrow.left{ left:18px }
+  .arrow.right{ right:18px }
+
+  /* content panels below hero */
+  .content{
+    width:100%;
+    max-width:var(--max);
+    margin:40px auto 120px;
+    padding:28px 20px;
+    display:grid;
+    grid-template-columns: 1fr 360px;
+    gap:30px;
+    z-index:3;
+  }
+  .panel{
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border-radius:12px;
+    padding:22px;
+    box-shadow: 0 8px 30px rgba(3,3,3,0.45);
+  }
+  .panel h3{ color:var(--accent); margin-top:0 }
+  .timeline{ margin-top:12px; display:flex; flex-direction:column; gap:14px; }
+  .timeline .item{ display:flex; gap:12px; align-items:flex-start; }
+  .timeline .item .year{
+    min-width:70px; font-weight:800; color:#fff; font-size:14px;
+    background: rgba(255,255,255,0.03); padding:8px; border-radius:8px; text-align:center;
+  }
+  .timeline .item .desc{ color:#ddd; font-size:14px }
+
+  /* right column smaller cards */
+  .card{ background: rgba(255,255,255,0.03); border-radius:10px; padding:14px; margin-bottom:12px }
+  .cast{ display:flex; gap:12px; align-items:center }
+  .avatar{ width:64px; height:64px; border-radius:8px; background:#222; overflow:hidden; flex:0 0 64px }
+  .avatar img{ width:100%; height:100%; object-fit:cover; display:block }
+  .cast .meta{ font-size:14px }
+  .cast .meta .name{ font-weight:700; color:#fff }
+  .cast .meta .role{ color:#d1d1d1; font-size:13px }
+
+  footer.sitefoot{
+    text-align:center;
+    color: #a3a3a3;
+    padding:24px 12px;
+    margin-top:24px;
+    border-top:1px solid rgba(255,255,255,0.02)
+  }
+
+  /* responsive */
+  @media (max-width:980px){
+    .content{ grid-template-columns: 1fr; padding:18px }
+    .left-content{ max-width:100% }
+    .thumbs{ display:none }
+    .social-side{ display:none }
+    header.site-header{ height:64px }
+    .hero{ min-height:520px }
+  }
+  @media (max-width:560px){
+    h1.hero-title{ font-size:28px }
+    .cta-row{ flex-direction:column; align-items:flex-start }
+    .arrow{ display:none }
+  }
+
+</style>
+</head>
+<body>
+  <div class="page">
+    
+
+    <!-- Header / Nav -->
+    <header class="site-header" role="banner">
+      <div class="nav-wrap">
+        <div class="brand">
+          <div class="logo">STALINGRAD — ENEMY AT THE GATES</div>
+        </div>
+
+        <nav class="main-nav" role="navigation" aria-label="Main">
+          <a href="#about">Танилцуулга</a>
+          <a href="#timeline">Цагийн шугам</a>
+          <a href="#characters">Дүрүүд</a>
+          <a href="#gallery">Галерей</a>
+          <a href="#contact">Холбоо</a>
+        </nav>
+
+        <div style="width:120px; text-align:right; font-size:13px; color:rgba(255,255,255,0.8)">
+          <?!-- small spacer for layout --> 
+        </div>
+      </div>
+    </header>
+
+    <!-- HERO with slideshow -->
+    <section class="hero" id="top">
+      <div class="slides" id="slides">
+        <!-- slide backgrounds (use public images) -->
+        <div class="slide active" data-title="Stalingrad Ruins" data-sub="1942–1943" style="background-image:url('q.jpg')"></div>
+        <div class="slide" data-title="Snipers and Streets" data-sub="Urban warfare" style="background-image:url('e.jpg')"></div>
+        <div class="slide" data-title="Mamaev Kurgan" data-sub="Memory & sacrifice" style="background-image:url('r.jpg')"></div>
+      </div>
+
+      <!-- arrows -->
+      <button class="arrow left" id="prev" aria-label="Previous slide" title="Prev">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M15 18l-6-6 6-6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="arrow right" id="next" aria-label="Next slide" title="Next">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 6l6 6-6 6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+
+      <!-- overlay content -->
+      <div class="hero-overlay">
+        <div class="left-content">
+          <div class="eyebrow">1942 — 1943 · СТАЛИНГРАД</div>
+          <h1 class="hero-title" id="slide-title">Stalingrad Ruins</h1>
+          <p class="lead" id="slide-sub">Дэлхийн II дайны хамгийн том, хамгийн цус урсагдсан тулаануудын нэг. Хотын гудамж бүрт амьдрал ба үхэл зөрчилдөнө.</p>
+
+          <div class="cta-row" style="margin-top:14px">
+            <a class="btn" href="#about">Дэлгэрэнгүй</a>
+            <a class="more-link" href="#gallery">Зураг үзэх →</a>
+          </div>
+        </div>
+
+        <!-- right column small summary (visual balance) -->
+        <div style="width:320px; pointer-events:auto;">
+          <div style="background:rgba(0,0,0,0.35); padding:16px; border-radius:12px;">
+            <div style="font-weight:800; color:var(--accent); margin-bottom:8px">Кино ба бодит түүх</div>
+            <div style="color:#e6e6e6; font-size:14px">
+              "Enemy at the Gates" кино нь Сталинградын снайперын тулаан, Зайцевын баатарлаг үйл явдлыг өгүүлнэ — хэсэг баатар, хувь хүн ба суртал ухуулгын мөргөлдөөн.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- bottom thumbs -->
+      <div class="thumbs" id="thumbs">
+        <div class="thumb" data-index="0"><div class="dot">01</div><div style="opacity:.95">Stalingrad Ruins</div></div>
+        <div class="thumb" data-index="1"><div class="dot">02</div><div style="opacity:.95">Snipers</div></div>
+        <div class="thumb" data-index="2"><div class="dot">03</div><div style="opacity:.95">Mamaev</div></div>
+      </div>
+    </section>
+
+    <!-- Social vertical -->
+    <div class="social-side" aria-hidden="false">
+      <a href="#" title="Twitter">TWITTER</a>
+      <a href="#" title="Facebook">FACEBOOK</a>
+      <a href="#" title="Instagram">INSTAGRAM</a>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <main class="content" role="main">
+      <div class="panel" id="about">
+        <h3>Товч танилцуулга</h3>
+        <p>Сталинградын тулалдаан (1942–1943) нь Дэлхийн II дайны чухал эргэлтийн цэгүүдийн нэг. Хотын төв гудамж бүрт ширүүн байлдаан болж, олон мянган хүн амь үрэгджээ. Кино "Enemy at the Gates" энэ үеийн снайперын тулаан, хувь хүний зориг, суртал ухуулгыг харуулдаг.</p>
+
+        <h3 style="margin-top:18px">Яагаад чухал вэ?</h3>
+        <ul style="color:#ddd; margin-left:18px">
+          <li>Германы 6-р армийн гарт байсан томоохон хотоос Зөвлөлт Холбоот Улс ялалт байгуулсан.</li>
+          <li>Тулаан нь фронтын эрчимийг өөрчилж, Нацистын довтолгоог зогсоосон.</li>
+          <li>Суртал ухуулга, нэр алдрын хэрэглээ (воеенный пиар) нь тухайн үеийн бодлогод их нөлөө үзүүлсэн.</li>
+        </ul>
+      </div>
+
+      <aside>
+        <div class="card">
+          <h3>Гол дүрүүд</h3>
+          <div class="cast" style="margin-top:10px">
+            <div class="avatar"><img src="Vasiliy-zaytsev.jpg" alt="Jude Law"></div>
+            <div class="meta">
+              <div class="name">Василий Зайцев (V. Zaytsev)</div>
+              <div class="role">Кино: Jude Law — Зөвлөлтийн мэргэн буудагч</div>
+            </div>
+          </div>
+
+          <div class="cast" style="margin-top:12px">
+            <div class="avatar"><img src="kenig.jpeg" alt="Ed Harris"></div>
+            <div class="meta">
+              <div class="name">Майор Кёниг</div>
+              <div class="role">Кино: Ed Harris — Германы мэргэн буудагч</div>
+            </div>
+          </div>
+
+          <div class="cast" style="margin-top:12px">
+            <div class="avatar"><img src="emgtei.jpeg" alt="Rachel Weisz"></div>
+            <div class="meta">
+              <div class="name">Таня Чернова</div>
+              <div class="role">Кино: Rachel Weisz — эмэгтэй дүр</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:14px">
+          <h3>Хурдан баримт</h3>
+          <div style="color:#ddd; font-size:14px; margin-top:8px">
+            <strong>Өндөр үр дагавар:</strong> 2 сая орчим хүн оролцсон гэж тооцогдоно.<br>
+            <strong>Хугацаа:</strong> 1942.07 - 1943.02<br>
+            <strong>Чухал үйл явдал:</strong> Зөвлөлтийн бүсэлсэн ажиллагаа (Operation Uranus).
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <!-- Timeline block wide -->
+    <section style="max-width:var(--max); margin:0 auto 40px; padding:0 20px;">
+      <div class="panel">
+        <h3 id="timeline">Цагийн шугам</h3>
+        <div class="timeline">
+          <div class="item"><div class="year">1942 Jul</div><div class="desc">Германы арми Сталинград руу дайралт эхлүүлэв.</div></div>
+          <div class="item"><div class="year">1942 Sep</div><div class="desc">Хотын гудамж бүрийн төлөө ширүүн тулалдаан өрнөх болов.</div></div>
+          <div class="item"><div class="year">1942 Nov</div><div class="desc">Зөвлөлтийн "Уран" ажиллагаа эхэлж, Германын 6-р армийг бүслэв.</div></div>
+          <div class="item"><div class="year">1943 Feb</div><div class="desc">Германы 6-р арми бууж өгч, тулалдаан төгсөв.</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- gallery -->
+    <section id="gallery" style="max-width:var(--max); margin:0 auto 60px; padding:0 20px;">
+      <div class="panel">
+        <h3>Галерей</h3>
+        <div style="margin-top:12px; display:grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap:12px;">
+          <img style="width:100%; border-radius:8px; height:160px; object-fit:cover;" src="a.jpeg" alt="">
+          <img style="width:100%; border-radius:8px; height:160px; object-fit:cover;" src="s.jpeg" alt="">
+          <img style="width:100%; border-radius:8px; height:160px; object-fit:cover;" src="d.jpeg" alt="">
+          <img style="width:100%; border-radius:8px; height:160px; object-fit:cover;" src="f.jpg" alt="">
+        </div>
+      </div>
+    </section>
+
+    <!-- contact -->
+    <section id="contact" style="max-width:var(--max); margin:0 auto 80px; padding:0 20px;">
+      <div class="panel">
+        <h3>Холбоо</h3>
+        <p style="color:#ddd">Хэрэв та сайт болон агуулгын талаар нэмэлт мэдээлэл авах, зөвлөмж, эсвэл эвент хийх сонирхолтой бол бидэнтэй холбоо барина уу:</p>
+        <p style="color:#ddd; font-weight:700">email: lkhsanchir@gmail.com</p>
+        <p style="color: #ddd">Багийн ахлагч : Санчирболд</p>
+        <p style="color: #ddd">Багийн гишүүд : Мөнгөнтулга, Эрхэмбаяр, Мишиг, Баярбаясгалан, Х.Дөлгөөн, Ч.Дөлгөөн, Ану, Хангай,  Долгион</p>
+      </div>
+    </section>
+
+    <footer class="sitefoot">
+       <span id="year"></span> | Enemy at the Gate |
+    </footer>
+
+  </div>
+
+<script>
+  // Simple slideshow logic
+  (function(){
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const thumbs = Array.from(document.querySelectorAll('.thumb'));
+    const titleEl = document.getElementById('slide-title');
+    const subEl = document.getElementById('slide-sub');
+    const prevBtn = document.getElementById('prev');
+    const nextBtn = document.getElementById('next');
+    let current = 0;
+    let timer = null;
+    const INTERVAL = 5500;
+
+    function show(index){
+      slides.forEach((s,i)=> s.classList.toggle('active', i===index));
+      thumbs.forEach((t,i)=> t.classList.toggle('active', i===index));
+      // update text
+      const s = slides[index];
+      titleEl.textContent = s.dataset.title || '';
+      subEl.textContent = s.dataset.sub || '';
+      current = index;
+    }
+
+    function next(){
+      show((current+1) % slides.length);
+    }
+    function prev(){
+      show((current-1 + slides.length) % slides.length);
+    }
+
+    // thumbs click
+    thumbs.forEach(t=>{
+      t.addEventListener('click', ()=> {
+        const idx = Number(t.dataset.index);
+        show(idx);
+        resetTimer();
+      });
+    });
+
+    nextBtn.addEventListener('click', ()=>{ next(); resetTimer(); });
+    prevBtn.addEventListener('click', ()=>{ prev(); resetTimer(); });
+
+    // keyboard arrows
+    window.addEventListener('keydown', (e)=> {
+      if(e.key === 'ArrowRight') { next(); resetTimer(); }
+      if(e.key === 'ArrowLeft') { prev(); resetTimer(); }
+    });
+
+    // autoplay
+    function startTimer(){ timer = setInterval(next, INTERVAL); }
+    function stopTimer(){ if(timer) clearInterval(timer); timer = null; }
+    function resetTimer(){ stopTimer(); startTimer(); }
+
+    // pause on hover
+    const hero = document.querySelector('.hero');
+    hero.addEventListener('mouseenter', stopTimer);
+    hero.addEventListener('mouseleave', startTimer);
+
+    // init
+    show(0);
+    startTimer();
+  })();
+</script>
+
+</body>
+</html>
